@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Company-Specific AI Interviewer</title><link rel="stylesheet" href="/static/styles.css">
+</head><body>
+<header class="topbar"><div class="brand">AI Interviewer</div><span class="tag">Mock interview workspace</span></header>
+<main class="container">
+<section class="hero"><p class="eyebrow">PRACTICE WITH PURPOSE</p><h1>Your company-specific interview practice</h1><p>Set the role and interview rules, answer questions, and receive practical feedback.</p></section>
+<section id="setupPanel" class="panel">
+<h2>1. Interview setup</h2>
+<div class="form-grid">
+<label>Company name<input id="company" value="Example Technologies"></label>
+<label>Job role<input id="role" value="Python Developer"></label>
+<label>Experience level<select id="experience"><option>Fresher</option><option>0–2 years</option><option>3–5 years</option><option>Experienced</option></select></label>
+<label>Interview type<select id="interviewType"><option>Technical</option><option>HR</option><option>Managerial</option><option>Mixed</option></select></label>
+<label>Number of questions<select id="questionCount"><option>3</option><option selected>5</option><option>7</option><option>10</option></select></label>
+</div>
+<label>Company-specific instructions / interview rules<textarea id="rules" rows="4" placeholder="Example: Ask one question at a time. Focus on Python, SQL and problem-solving. Keep the level suitable for freshers."></textarea></label>
+<label class="upload">Optional question-bank CSV<input id="dataset" type="file" accept=".csv"></label>
+<p id="datasetStatus" class="muted">No dataset selected. You can continue without one.</p>
+<button id="startBtn" class="primary">Generate interview questions</button><p id="setupError" class="error"></p>
+</section>
+<section id="interviewPanel" class="panel hidden">
+<div class="section-head"><h2>2. Interview in progress</h2><span id="progress" class="tag"></span></div>
+<div class="interview-grid"><div><p class="muted">CURRENT QUESTION</p><h3 id="questionText"></h3>
+<label>Your answer<textarea id="answer" rows="7" placeholder="Type your answer here..."></textarea></label>
+<div class="button-row"><button id="speakBtn" class="secondary">Speak answer</button><button id="stopSpeakBtn" class="secondary">Stop listening</button><button id="submitBtn" class="primary">Submit answer</button></div>
+<p id="answerError" class="error"></p><div id="feedback" class="feedback hidden"></div>
+<button id="nextBtn" class="primary hidden">Next question</button><button id="finishBtn" class="primary hidden">Finish interview</button>
+</div><aside class="camera-card"><h3>Camera preview</h3><video id="camera" autoplay muted playsinline></video><button id="cameraBtn" class="secondary">Enable camera</button><p class="muted small">Preview stays in this browser. This MVP does not record or upload video.</p></aside></div>
+</section>
+<section id="reportPanel" class="panel hidden"><h2>3. Your practice report</h2><div id="reportContent"></div><button id="restartBtn" class="secondary">Start another interview</button></section>
+<footer>AI-generated feedback is for practice only, not a hiring decision.</footer>
+</main><script src="/static/app.js"></script></body></html>

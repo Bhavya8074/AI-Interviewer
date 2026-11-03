@@ -1,0 +1,38 @@
+# Virtual environments
+.venv*/
+.venv/
+.venv312/
+env/
+.vscode/
+.gitignore/
+
+# Python bytecode and tooling
+__pycache__/
+*.py[cod]
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+.DS_Store
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+
+# Local environment variables and credentials
+.env*
+
+# Generated test audio
+kokoro_test_*.wav
+
+# Private company datasets
+data/*.csv
+!data/.gitkeep
+
+# OS metadata
+Thumbs.db
