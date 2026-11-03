@@ -173,6 +173,64 @@ function renderFeedback(r) {
   box.append(sample);
   show("feedback");
 }
+
+$("submitBtn").addEventListener("click", async () => {
+  const answerText = $("answer").value.trim();
+
+  if (!answerText) {
+    setError("answerError", "Please enter your answer before submitting.");
+    return;
+  }
+
+  $("submitBtn").disabled = true;
+  $("submitBtn").textContent = "Evaluating...";
+
+  try {
+    const res = await fetch("/api/evaluate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        question: questions[current],
+        answer: answerText,
+        company: setup.company,
+        role: setup.role,
+        interview_type: setup.interview_type,
+        company_rules: setup.company_rules
+      })
+    });
+
+    const d = await res.json();
+
+    if (!res.ok) {
+      throw Error(d.detail || "Answer evaluation failed.");
+    }
+
+    answers.push({
+      question: questions[current],
+      answer: answerText,
+      feedback: d
+    });
+
+    renderFeedback(d);
+
+    hide("submitBtn");
+
+    if (current < questions.length - 1) {
+      show("nextBtn");
+    } else {
+      show("finishBtn");
+    }
+
+    setError("answerError", "");
+
+  } catch (err) {
+    setError("answerError", err.message);
+  } finally {
+    $("submitBtn").disabled = false;
+    $("submitBtn").textContent = "Submit Answer";
+  }
+});
+
 $("nextBtn").addEventListener("click", () => {
   current++;
   renderQuestion();
