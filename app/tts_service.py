@@ -1,21 +1,50 @@
 
-from kokoro import KPipeline
-import soundfile as sf
-import numpy as np
 from io import BytesIO
+from threading import Lock
 
 # Load Kokoro only once and reuse it
 pipeline = None
+_pipeline_lock = Lock()
+_pipeline_state = "not_started"
 
 
 def get_pipeline():
-    global pipeline
+    global pipeline, _pipeline_state
 
-    if pipeline is None:
-        print("Loading Kokoro voice model...")
-        pipeline = KPipeline(lang_code="a")
+    if pipeline is not None:
+        return pipeline
+
+    with _pipeline_lock:
+        if pipeline is not None:
+            return pipeline
+        _pipeline_state = "loading"
+        try:
+            from kokoro import KPipeline
+            print("Loading Kokoro voice model...")
+            pipeline = KPipeline(lang_code="a")
+            _pipeline_state = "ready"
+        except ImportError as exc:
+            _pipeline_state = "unavailable"
+            raise RuntimeError(
+                "Local speech is unavailable. Install the speech packages from requirements.txt."
+            ) from exc
+        except Exception:
+            _pipeline_state = "unavailable"
+            raise
 
     return pipeline
+
+
+def preload_pipeline():
+    """Warm Kokoro in the background so the first question can speak sooner."""
+    try:
+        get_pipeline()
+    except Exception as exc:
+        print(f"Kokoro voice warmup failed: {exc}")
+
+
+def get_pipeline_state() -> str:
+    return _pipeline_state
 
 
 def generate_speech(text: str, voice: str = "af_heart") -> bytes:
@@ -24,6 +53,8 @@ def generate_speech(text: str, voice: str = "af_heart") -> bytes:
         raise ValueError("Speech text cannot be empty.")
 
     kokoro = get_pipeline()
+    import numpy as np
+    import soundfile as sf
 
     generator = kokoro(
         text.strip(),

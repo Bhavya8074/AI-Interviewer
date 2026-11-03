@@ -47,7 +47,7 @@ def _generate(prompt: str, temperature: float = 0.7) -> str:
 def _json_from_text(text: str):
     cleaned = text.strip()
     if cleaned.startswith("```"):
-        cleaned = cleaned.split("\\n", 1)[-1]
+        cleaned = cleaned.split("\n", 1)[-1]
         if cleaned.endswith("```"):
             cleaned = cleaned[:-3]
     start, end = cleaned.find("{"), cleaned.rfind("}")

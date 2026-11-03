@@ -1,6 +1,8 @@
 import csv
 import io
 import os
+import asyncio
+from contextlib import asynccontextmanager
 from pathlib import Path
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile, File
@@ -12,7 +14,19 @@ from app import tts_service
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
-app = FastAPI(title="Company-Specific AI Interviewer", version="1.0.0")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Start loading the voice model while the user sets up the interview.
+    warmup = asyncio.create_task(asyncio.to_thread(tts_service.preload_pipeline))
+    try:
+        yield
+    finally:
+        await warmup
+
+
+app = FastAPI(title="Company-Specific AI Interviewer", version="1.0.0", lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
@@ -21,7 +35,11 @@ def home():
 
 @app.get("/api/health")
 def health():
-    return {"status": "ok", "gemini_key_configured": bool(os.getenv("GEMINI_API_KEY"))}
+    return {
+        "status": "ok",
+        "groq_key_configured": bool(os.getenv("GROQ_API_KEY", "").strip()),
+        "voice_model": tts_service.get_pipeline_state(),
+    }
 
 @app.post("/api/speak")
 def speak(request: dict):
@@ -58,7 +76,7 @@ async def dataset_preview(file: UploadFile = File(...)):
         rows = list(csv.DictReader(io.StringIO(raw.decode("utf-8-sig"))))
         if not rows:
             raise ValueError("CSV has no data rows.")
-        context = "\\n".join(str(row) for row in rows[:40])
+        context = "\n".join(str(row) for row in rows[:40])
         return {"filename": file.filename, "rows_read": len(rows), "context": context[:12000]}
     except Exception as exc:
         raise HTTPException(400, f"Could not read CSV: {exc}")
