@@ -12,8 +12,8 @@ This is a working MVP, not a production hiring system. Groq receives text answer
 
 ## Windows PowerShell setup
 ```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
+py -3.12 -m venv .venv312
+.\.venv312\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 pip install -r requirements.txt
 Copy-Item .env.example .env
@@ -21,7 +21,7 @@ Copy-Item .env.example .env
 If activation is blocked, run:
 ```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\Activate.ps1
+.\.venv312\Scripts\Activate.ps1
 ```
 
 Open `.env` and add your NEW key:
@@ -36,7 +36,7 @@ You can upload a UTF-8 CSV in the app. Suggested columns: `role`, `topic`, `ques
 
 ## Run
 ```powershell
-uvicorn app.main:app --reload
+.\.venv312\Scripts\python.exe -m uvicorn app.main:app --reload
 ```
 Open http://127.0.0.1:8000
 

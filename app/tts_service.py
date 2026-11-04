@@ -1,6 +1,7 @@
 
 from io import BytesIO
 from threading import Lock
+import sys
 
 # Load Kokoro only once and reuse it
 pipeline = None
@@ -21,12 +22,15 @@ def get_pipeline():
         try:
             from kokoro import KPipeline
             print("Loading Kokoro voice model...")
-            pipeline = KPipeline(lang_code="a")
+            pipeline = KPipeline(lang_code="a", repo_id="hexgrad/Kokoro-82M")
             _pipeline_state = "ready"
         except ImportError as exc:
             _pipeline_state = "unavailable"
             raise RuntimeError(
-                "Local speech is unavailable. Install the speech packages from requirements.txt."
+                "Kokoro could not import a required speech package: "
+                f"{exc}. Install or repair the speech dependencies with "
+                f"'{sys.executable} -m pip install -r requirements.txt'. "
+                f"The server is running with {sys.executable}."
             ) from exc
         except Exception:
             _pipeline_state = "unavailable"
